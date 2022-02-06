@@ -616,6 +616,25 @@ const converters = {
             return result;
         },
     },
+    meter_identification: {
+        cluster: 'haMeterIdentification',
+        type: ['readResponse'],
+        convert: (model, msg, publish, options, meta) => {
+            const result = {};
+            const elements = [
+                /* 0x000A*/ 'softwareRevision',
+                /* 0x000D*/ 'availablePower',
+                /* 0x000E*/ 'powerThreshold',
+            ];
+            for (const at of elements) {
+                const atSnake = at.split(/(?=[A-Z])/).join('_').toLowerCase();
+                if (msg.data[at]) {
+                    result[atSnake] = msg.data[at];
+                }
+            }
+            return result;
+        },
+    },
     metering: {
         /**
          * When using this converter also add the following to the configure method of the device:
@@ -2392,6 +2411,26 @@ const converters = {
             if (msg.data.hasOwnProperty('moesStartUpOnOff')) {
                 const property = postfixWithEndpointName('power_on_behavior', msg, model);
                 return {[property]: lookup[msg.data['moesStartUpOnOff']]};
+            }
+        },
+    },
+    moes_switch: {
+        cluster: 'manuSpecificTuya',
+        type: ['commandDataResponse', 'commandDataReport'],
+        convert: (model, msg, publish, options, meta) => {
+            const dpValue = tuya.firstDpValue(msg, meta, 'moes_switch');
+            const dp = dpValue.dp;
+            const value = tuya.getDataValue(dpValue);
+
+            switch (dp) {
+            case tuya.dataPoints.moesSwitchPowerOnBehavior:
+                return {power_on_behavior: tuya.moesSwitch.powerOnBehavior[value]};
+            case tuya.dataPoints.moesSwitchIndicateLight:
+                return {indicate_light: tuya.moesSwitch.indicateLight[value]};
+            default:
+                meta.logger.warn(`fromZigbee:moes_switch: NOT RECOGNIZED DP #${
+                    dp} with data ${JSON.stringify(dpValue)}`);
+                break;
             }
         },
     },
@@ -5168,8 +5207,16 @@ const converters = {
     aqara_opple: {
         cluster: 'aqaraOpple',
         type: ['attributeReport', 'readResponse'],
-        options: [exposes.options.precision('temperature'), exposes.options.calibration('temperature'),
-            exposes.options.precision('illuminance'), exposes.options.calibration('illuminance', 'percentual')],
+        options: (definition) => {
+            const result = [];
+            if (definition.exposes.find((e) => e.name === 'temperature')) {
+                result.push(exposes.options.precision('temperature'), exposes.options.calibration('temperature'));
+            }
+            if (definition.exposes.find((e) => e.name === 'illuminance')) {
+                result.push(exposes.options.precision('illuminance'), exposes.options.calibration('illuminance', 'percentual'));
+            }
+            return result;
+        },
         convert: (model, msg, publish, options, meta) => {
             const payload = {};
             if (msg.data.hasOwnProperty('247')) {
@@ -5315,8 +5362,9 @@ const converters = {
                             payload.presence_event = {0: 'enter', 1: 'leave', 2: 'left_enter', 3: 'right_leave', 4: 'right_enter',
                                 5: 'left_leave', 6: 'approach', 7: 'away', 255: null}[value];
                         }
-                    } else if (index ===103) payload.monitoring_mode = value === 1 ? 'left_right' : 'undirected'; // RTCZCGQ11LM
-                    else if (index === 105) {
+                    } else if (index === 103) {
+                        if (['RTCZCGQ11LM'].includes(model.model)) payload.monitoring_mode = value === 1 ? 'left_right' : 'undirected';
+                    } else if (index === 105) {
                         if (['RTCGQ13LM'].includes(model.model)) {
                             payload.motion_sensitivity = {1: 'low', 2: 'medium', 3: 'high'}[value];
                         } else if (['RTCZCGQ11LM'].includes(model.model)) {

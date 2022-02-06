@@ -12,7 +12,7 @@ const utils = require('../lib/utils');
 
 const TS011Fplugs = ['_TZ3000_5f43h46b', '_TZ3000_cphmq0q7', '_TZ3000_dpo1ysak', '_TZ3000_ew3ldmgx', '_TZ3000_gjnozsaz',
     '_TZ3000_jvzvulen', '_TZ3000_mraovvmm', '_TZ3000_nfnmi125', '_TZ3000_ps3dmato', '_TZ3000_w0qqde0g', '_TZ3000_u5u4cakc',
-    '_TZ3000_rdtixbnu', '_TZ3000_typdpbpg'];
+    '_TZ3000_rdtixbnu', '_TZ3000_typdpbpg', '_TZ3000_2xlvlnez'];
 
 const tzLocal = {
     TS0504B_color: {
@@ -250,7 +250,7 @@ module.exports = [
         model: 'TS0202',
         vendor: 'TuYa',
         description: 'Motion sensor',
-        whiteLabel: [{vendor: 'Mercator Ikuü', model: 'SMA02P'}, {vendor: 'TuYa ', model: 'TY-ZPR06'}],
+        whiteLabel: [{vendor: 'Mercator Ikuü', model: 'SMA02P'}, {vendor: 'TuYa', model: 'TY-ZPR06'}],
         fromZigbee: [fz.ias_occupancy_alarm_1, fz.battery, fz.ignore_basic_report, fz.ias_occupancy_alarm_1_report],
         toZigbee: [],
         exposes: [e.occupancy(), e.battery_low(), e.tamper(), e.battery()],
@@ -882,6 +882,7 @@ module.exports = [
             {modelID: 'TS0601', manufacturerName: '_TZE200_5sbebbzs'},
             {modelID: 'TS0601', manufacturerName: '_TZE200_zuz7f94z'},
             {modelID: 'TS0601', manufacturerName: '_TZE200_zyrdrmno'},
+            {modelID: 'TS0601', manufacturerName: '_TZE200_68nvbio9'},
         ],
         model: 'TS0601_cover',
         vendor: 'TuYa',

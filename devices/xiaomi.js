@@ -1174,8 +1174,8 @@ module.exports = [
             exposes.enum('mute_buzzer', ea.SET, ['Mute']).withDescription('Mute the buzzer for 10 minutes (buzzer cannot be ' +
                 'pre-muted, because this function only works when the alarm is triggered)'),
             exposes.binary('mute', ea.STATE_GET, true, false).withDescription('Buzzer muted'),
-            exposes.switch().withState('linkage_alarm', true, 'After being turned on, one of the devices triggers the ' +
-                'natural gas leakage alarm, and other devices with linkage turned on', ea.ALL, true, false),
+            exposes.binary('linkage_alarm', ea.ALL, true, false).withDescription('When this option is enabled and a gas leak ' +
+                'is detected, other detectors with this option enabled will also sound the alarm buzzer'),
             exposes.binary('state', ea.STATE_GET, 'preparation', 'work').withDescription('"Preparation" or "work" ' +
                 '(measurement of the gas concentration value and triggering of an alarm are only performed in the "work" state)'),
             exposes.numeric('power_outage_count', ea.STATE_GET).withDescription('Number of power outages (since last pairing)')],
@@ -1289,7 +1289,7 @@ module.exports = [
         model: 'LLKZMK11LM',
         vendor: 'Xiaomi',
         description: 'Aqara wireless relay controller',
-        fromZigbee: [fz.xiaomi_switch_basic, fz.xiaomi_power, fz.ignore_multistate_report, fz.on_off],
+        fromZigbee: [fz.xiaomi_switch_basic, fz.xiaomi_power, fz.ignore_multistate_report, fz.on_off, fz.aqara_opple],
         meta: {multiEndpoint: true},
         toZigbee: [tz.on_off, tz.LLKZMK11LM_interlock, tz.xiaomi_power],
         endpoint: (device) => {
@@ -1597,7 +1597,8 @@ module.exports = [
             e.battery(), e.battery_voltage(), e.action([
                 'single_left', 'single_right', 'single_both',
                 'double_left', 'double_right', 'double_both',
-                'triple_left', 'triple_right', 'triple_both']),
+                'triple_left', 'triple_right', 'triple_both',
+                'hold_left', 'hold_right', 'hold_both']),
             exposes.enum('click_mode', ea.ALL, ['fast', 'multi'])
                 .withDescription('Click mode, fast: only supports single click which will be send immediately after clicking.' +
                     'multi: supports more events like double and hold'),
